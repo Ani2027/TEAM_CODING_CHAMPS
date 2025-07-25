@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Log Details</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --slate-900: #111827;
+        --slate-800: #1f2937;
+        --slate-700: #374151;
+        --slate-400: #9ca3af;
+        --slate-200: #e5e7eb;
+        --indigo-500: #6366f1;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        margin: 0;
+        background-color: var(--slate-900);
+        color: var(--slate-200);
+      }
+      .container {
+        padding: 2rem 3rem;
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--slate-700);
+        padding-bottom: 1rem;
+        margin-bottom: 2rem;
+      }
+      .header h1 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 600;
+      }
+      .back-button {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        background-color: var(--slate-800);
+        border: 1px solid var(--slate-700);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: background-color 0.2s, transform 0.2s;
+      }
+      .back-button:hover {
+        background-color: var(--slate-700);
+        transform: translateY(-2px);
+      }
+      .log-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      .log-table th,
+      .log-table td {
+        padding: 1rem 1.25rem;
+        text-align: left;
+        border-bottom: 1px solid var(--slate-700);
+      }
+      .log-table th {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--slate-400);
+        font-weight: 600;
+      }
+      .log-table tbody tr {
+        transition: background-color 0.2s;
+      }
+      .log-table tbody tr:hover {
+        background-color: var(--slate-800);
+      }
+      .status-tag {
+        padding: 0.25rem 0.6rem;
+        border-radius: 99px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        background-color: var(--slate-700);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1 id="log-title">Loading Logs...</h1>
+        <a href="dashboard.html" class="back-button">← Back to Dashboard</a>
+      </div>
+      <div class="log-container">
+        <table class="log-table">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Camera ID</th>
+              <th>Event Details</th>
+              <th>Confidence</th>
+            </tr>
+          </thead>
+          <tbody id="log-data"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const mode = urlParams.get("mode");
+
+        const logTitle = document.getElementById("log-title");
+        const logDataBody = document.getElementById("log-data");
+
+        const titles = {
+          fire: "🔥 Fire Detection Logs",
+          ppe: "👷 PPE Kit Logs",
+          theft: "🏃 Theft Detection Logs",
+        };
+
+        // Set title immediately
+        const title = titles[mode] || "All Logs";
+        logTitle.textContent = title;
+        document.title = title;
+
+        // Fetch and display logs
+        fetch(`../logs.json?t=${new Date().getTime()}`)
+          .then((response) => response.json())
+          .then((allLogs) => {
+            let tableRowsHTML = "";
+            const filteredLogs = allLogs.filter(
+              (log) => log.detection_type.toLowerCase() === mode
+            );
+
+            filteredLogs.forEach((log) => {
+              const timestamp = new Date(log.timestamp);
+              const formattedTime = `${timestamp.toLocaleDateString()} ${timestamp.toLocaleTimeString()}`;
+              tableRowsHTML += `
+                            <tr>
+                                <td>${formattedTime}</td>
+                                <td>${log.camera_id}</td>
+                                <td>${log.event_details}</td>
+                                <td>${log.confidence}</td>
+                            </tr>
+                        `;
+            });
+
+            logDataBody.innerHTML = tableRowsHTML;
+          })
+          .catch((error) => {
+            console.error("Could not load logs:", error);
+            logDataBody.innerHTML =
+              '<tr><td colspan="4">Could not load logs. Is the backend running and has it detected anything?</td></tr>';
+          });
+      });
+    </script>
+  </body>
+</html>

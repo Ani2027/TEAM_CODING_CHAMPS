@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CCTV Surveillance Dashboard</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --slate-900: #111827;
+        --slate-800: #1f2937;
+        --slate-700: #374151;
+        --slate-400: #9ca3af;
+        --slate-200: #e5e7eb;
+        --indigo-500: #6366f1;
+        --red-500: #ef4444;
+        --orange-500: #f97316;
+        --yellow-500: #eab308;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        margin: 0;
+        background-color: var(--slate-900);
+        color: var(--slate-200);
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+      }
+      .sidebar {
+        width: 260px;
+        flex-shrink: 0;
+        background-color: var(--slate-900);
+        border-right: 1px solid var(--slate-700);
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+      }
+      .main-dashboard {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .main-content {
+        flex-grow: 1;
+        padding: 2rem;
+        overflow-y: auto;
+      }
+      .sidebar h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0 0 2rem 0;
+        text-align: center;
+        color: white;
+      }
+      .sidebar-heading {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--slate-400);
+        padding: 0 1.25rem;
+        margin-bottom: 0.5rem;
+      }
+      .sidebar nav ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+      }
+      .sidebar nav a {
+        display: block;
+        color: var(--slate-200);
+        text-decoration: none;
+        padding: 0.85rem 1.25rem;
+        margin-bottom: 0.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: background-color 0.2s, color 0.2s;
+      }
+      .sidebar nav a:hover {
+        background-color: var(--slate-800);
+        color: white;
+      }
+      #main-header {
+        margin: 0;
+        font-weight: 600;
+        color: white;
+        border-bottom: 1px solid var(--slate-700);
+        padding: 1.5rem 2rem;
+        background-color: var(--slate-900);
+      }
+      .camera-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+        gap: 1.5rem;
+      }
+      .camera-feed {
+        background-color: var(--slate-800);
+        border: 1px solid var(--slate-700);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      }
+      .camera-feed img {
+        width: 100%;
+        height: auto;
+        display: block;
+        background-color: #000;
+      }
+      .camera-info {
+        padding: 1rem 1.25rem;
+      }
+      .camera-info h3 {
+        margin: 0;
+        color: white;
+        font-weight: 600;
+      }
+      .alerts-panel {
+        min-height: 100px;
+        border-top: 1px solid var(--slate-700);
+        background-color: #111827e0;
+        backdrop-filter: blur(5px);
+        padding: 1rem 2rem;
+      }
+      .alerts-panel h3 {
+        margin: 0 0 1rem 0;
+        color: white;
+        font-weight: 600;
+      }
+      #alerts-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .alert-item {
+        background-color: var(--slate-800);
+        padding: 0.75rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        border-left: 4px solid var(--red-500);
+      }
+      .alert-item span {
+        color: var(--slate-400);
+        margin-left: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <aside class="sidebar">
+      <h1>👁️ C-Watch</h1>
+      <p class="sidebar-heading">Logs & History</p>
+      <nav>
+        <ul>
+          <li>
+            <a href="log-details.html?mode=fire">🔥 Fire Detection Logs</a>
+          </li>
+          <li><a href="log-details.html?mode=ppe">👷 PPE Kit Logs</a></li>
+          <li>
+            <a href="log-details.html?mode=theft">🏃 Theft Detection Logs</a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <div class="main-dashboard">
+      <h2 id="main-header">Live Surveillance Feeds</h2>
+      <main class="main-content">
+        <div class="camera-grid">
+          <div class="camera-feed">
+            <img
+              id="cam-01-img"
+              src="../output_frames/cam-01.jpg"
+              alt="Camera 1 Feed"
+            />
+            <div class="camera-info"><h3>CAM-01: Main Entrance</h3></div>
+          </div>
+          <div class="camera-feed">
+            <img
+              id="cam-02-img"
+              src="../output_frames/cam-02.jpg"
+              alt="Camera 2 Feed"
+            />
+            <div class="camera-info"><h3>CAM-02: Warehouse Floor</h3></div>
+          </div>
+          <div class="camera-feed">
+            <img
+              id="cam-03-img"
+              src="../output_frames/cam-03.jpg"
+              alt="Camera 3 Feed"
+            />
+            <div class="camera-info"><h3>CAM-03: Parking Lot</h3></div>
+          </div>
+          <div class="camera-feed">
+            <img
+              id="cam-04-img"
+              src="../output_frames/cam-04.jpg"
+              alt="Camera 4 Feed"
+            />
+            <div class="camera-info"><h3>CAM-04: Loading Dock</h3></div>
+          </div>
+        </div>
+      </main>
+      <div class="alerts-panel">
+        <h3>Recent Alerts</h3>
+        <div id="alerts-list"></div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const REFRESH_INTERVAL_MS = 2000;
+        const alertColors = {
+          Fire: "var(--orange-500)",
+          PPE: "var(--yellow-500)",
+          Theft: "var(--red-500)",
+        };
+
+        async function updateAlerts() {
+          try {
+            const response = await fetch(
+              `../logs.jsonl?t=${new Date().getTime()}`
+            );
+            const text = await response.text();
+            const logs = text
+              .trim()
+              .split("\n")
+              .map((line) => JSON.parse(line))
+              .reverse();
+
+            const alertsList = document.getElementById("alerts-list");
+            alertsList.innerHTML = "";
+
+            logs.slice(0, 3).forEach((log) => {
+              const alertDiv = document.createElement("div");
+              alertDiv.className = "alert-item";
+              const borderColor =
+                alertColors[log.detection_type] || "var(--red-500)";
+              alertDiv.style.borderLeftColor = borderColor;
+              const logTime = new Date(log.timestamp).toLocaleTimeString();
+              alertDiv.innerHTML = `<strong>${log.event_details}</strong> on <strong>${log.camera_id}</strong><span>${logTime}</span>`;
+              alertsList.appendChild(alertDiv);
+            });
+          } catch (error) {
+            console.error("Could not fetch or update logs:", error);
+          }
+        }
+
+        function updateCameraImages() {
+          const cameraImageIds = [
+            "cam-01-img",
+            "cam-02-img",
+            "cam-03-img",
+            "cam-04-img",
+          ];
+          cameraImageIds.forEach((id) => {
+            const imgElement = document.getElementById(id);
+            if (imgElement) {
+              const newSrc = `../output_frames/${id.replace(
+                "-img",
+                ""
+              )}.jpg?t=${new Date().getTime()}`;
+              imgElement.src = newSrc;
+            }
+          });
+        }
+
+        updateAlerts();
+        updateCameraImages();
+
+        setInterval(() => {
+          updateAlerts();
+          updateCameraImages();
+        }, REFRESH_INTERVAL_MS);
+      });
+    </script>
+  </body>
+</html>
